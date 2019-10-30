@@ -11,4 +11,8 @@ Contains register addresses and macros - derived from the User Manual
 Contains macros and definitions to use the GPIO - derived from the User Manual.
 
 ### 001_LED_Toggle.c
-Test Project to validate drivers by flashing the onboard LED.
+Test Project to validate drivers by flashing the onboard LED via Pullup/Pulldown Output Type
+Test Project to validate drivers by flashing the onboard LED via Open Drain Output Type and external Pullup Resistor
+
+### 002_LED_Btn.c
+Test Project to validate drivers by reading input pin button state, and toggling LED accordingly.
