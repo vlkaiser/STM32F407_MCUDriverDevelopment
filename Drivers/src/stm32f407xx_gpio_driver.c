@@ -117,7 +117,8 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
 	/* Configure the Mode Settings of the GPIO Pin */
 	if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_ANALOG)
 	{
-		temp = pGPIOHandle->GPIO_PinConfig.GPIO_PinMode << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);	// Shift the MODE by 2 x pinNumber
+		//the non-interrupt mode
+		temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));	// Shift the MODE by 2 x pinNumber
 		pGPIOHandle->pGPIOx->MODER &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);						// Clear MODER
 		pGPIOHandle->pGPIOx->MODER |= temp;			// Or the temp value for those bits into the GPIO MODER register,
 	}
@@ -128,23 +129,24 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
 	temp = 0;									// clear temp
 
 	/* Configure the Speed Settings of the GPIO Pin */
-	temp = pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed);		// Shift the SPEED by 2 x pinNumber
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));		// Shift the SPEED by 2 x pinNumber
 	pGPIOHandle->pGPIOx->OSPEEDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed);						// Clear OSPEEDR
 	pGPIOHandle->pGPIOx->OSPEEDR |= temp;
 
 	temp = 0;									// clear temp
 
-	/* Configure the Pullup/Pulldown Settings of the GPIO Pin */
-	temp = pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdCtrl << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdCtrl);	// Shift the PUPD by 2 x pinNumber
-	pGPIOHandle->pGPIOx->OSPEEDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdCtrl);						// Clear PUPDR
-	pGPIOHandle->pGPIOx->PUPDR |= temp;
+	/* Configure the Output Type Setting of the GPIO Pin */
+
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType << (pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));		// Shift the OUTPUT TYPE by 1 x pinNumber
+	pGPIOHandle->pGPIOx->OTYPER &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType);						// Clear OTYPER
+	pGPIOHandle->pGPIOx->OTYPER |= temp;
 
 	temp = 0;									// clear temp
 
-	/* Configure the Output Type Setting of the GPIO Pin */
-	temp = pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType << pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType;			// Shift the OUTPUT TYPE by 1 x pinNumber
-	pGPIOHandle->pGPIOx->OTYPER &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType);						// Clear OTYPER
-	pGPIOHandle->pGPIOx->OTYPER |= temp;
+	/* Configure the Pullup/Pulldown Settings of the GPIO Pin */
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdCtrl << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));	// Shift the PUPD by 2 x pinNumber
+	pGPIOHandle->pGPIOx->OSPEEDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdCtrl);						// Clear PUPDR
+	pGPIOHandle->pGPIOx->PUPDR |= temp;
 
 	temp = 0;									// clear temp
 
