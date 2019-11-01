@@ -125,8 +125,39 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
 	else
 	{
 		//ToDo: Configure the interrupt mode of the GPIO Pin
+		if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_IT_FT)
+		{
+			//Rising Edge Interrupt: Configure the FTSR
+			EXTI->FTSR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber );		// Set FTSR
+			EXTI->RTSR &= ~( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber );		// Clear RTSR
+		}
+		else if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_IT_RT)
+		{
+			//Falling Edge Interrupt: Configure the RTSR
+			EXTI->RTSR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber );		// Set RTSR
+			EXTI->FTSR &= ~( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber );		// Clear FTSR
+		}
+		else
+		{
+			//Rising or Falling Edge Interrupt: Configure FTSR and RTSR
+			EXTI->FTSR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber );		// Set RTSR
+			EXTI->RTSR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber );		// Set FTSR
+		}
 	}
 	temp = 0;									// clear temp
+
+	EXTI->IMR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber );				// Enable interrupt delivery on EXTI line (based on pin number)
+
+
+	uint8_t temp1 = (pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber) / 4;			// Determine required EXTICR register
+	uint8_t temp2 = (pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber) % 4;			// Determine group position in EXTICR register
+
+	SYSCFG_PCLK_EN();															// Enable peripheral clock (SYSCFG)
+
+	uint8_t portCode = GPIO_BASEADDR_TO_CODE(pGPIOHandle->pGPIOx);				// Determine Interrupt Port
+	SYSCFG->EXTICR[temp1] |= ( portCode << ( temp2 * 4 ) );						// Enable selected Interrupt Control
+
+	temp1 = temp2 = 0;									// clear temps
 
 	/* Configure the Speed Settings of the GPIO Pin */
 	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));		// Shift the SPEED by 2 x pinNumber

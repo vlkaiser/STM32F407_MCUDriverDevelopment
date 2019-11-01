@@ -8,7 +8,7 @@
 #ifndef INC_STM32F407XX_GPIO_DRIVER_H_
 #define INC_STM32F407XX_GPIO_DRIVER_H_
 
-#include "stm32f407xx.h"
+#include <stm32f407xx.h>
 
 /*
  * Configuration Structure for a GPIO Pin, 0x04 Offset
