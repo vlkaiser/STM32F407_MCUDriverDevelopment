@@ -16,3 +16,10 @@ Test Project to validate drivers by flashing the onboard LED via Open Drain Outp
 
 ### 002_LED_Btn.c
 Test Project to validate drivers by reading input pin button state, and toggling LED accordingly.
+
+### 003_Ext_LED_Btn.c
+Test Project to validate drivers by reading input pin button state, and toggling LED accordingly from External components
+
+### 004_Interrupt_Btn.c
+Test Project to validate drivers reading input state of a button, generating an interrupt, and handling it to toggle an LED.
+**In progress**
