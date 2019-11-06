@@ -97,6 +97,18 @@
 #define EXTI_BASEADDR				(APB2PERIPH_BASE + 0x3C00U)		/* EXTI Base Address */
 
 /*
+ * IRQ (Interrupt Request) Numbers for STM32F407x MCU
+ */
+#define IRQ_EXTI0		6
+#define IRQ_EXTI1		7
+#define IRQ_EXTI2		8
+#define IRQ_EXTI3		9
+#define IRQ_EXTI4		10
+#define IRQ_EXTI9_5		23
+#define IRQ_EXTI5_10	40
+
+
+/*
  * Peripheral Register Definition Structure for RCC
  * Example: RCC_RegDef_t *pRCC = RCC;
  */
