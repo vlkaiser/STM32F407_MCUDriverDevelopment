@@ -24,6 +24,35 @@
 #define GPIO_PIN_SET	SET
 #define GPIO_PIN_RESET	RESET
 
+/************************ START: Processor Specific Details **********************************/
+ /*
+ * ARM Cortex M4 Processor NVIC ISERx Register Addresses
+ */
+#define NVIC_ISER0					( (__vo uint32_t*)0xE000E100 )
+#define NVIC_ISER1					( (__vo uint32_t*)0xE000E104 )
+#define NVIC_ISER2					( (__vo uint32_t*)0xE000E108 )
+#define NVIC_ISER3					( (__vo uint32_t*)0xE000E10C )
+#define NVIC_ISER4					( (__vo uint32_t*)0xE000E110 )
+#define NVIC_ISER5					( (__vo uint32_t*)0xE000E114 )
+#define NVIC_ISER6					( (__vo uint32_t*)0xE000E118 )
+#define NVIC_ISER7					( (__vo uint32_t*)0xE000E11C )
+
+ /*
+ * ARM Cortex M4 Processor NVIC ICERx Register Addresses
+ */
+#define NVIC_ICER0					( (__vo uint32_t*)0xE000E180 )
+#define NVIC_ICER1					( (__vo uint32_t*)0xE000E184 )
+#define NVIC_ICER2					( (__vo uint32_t*)0xE000E188 )
+#define NVIC_ICER3					( (__vo uint32_t*)0xE000E18C )
+#define NVIC_ICER4					( (__vo uint32_t*)0xE000E190 )
+#define NVIC_ICER5					( (__vo uint32_t*)0xE000E194 )
+#define NVIC_ICER6					( (__vo uint32_t*)0xE000E198 )
+#define NVIC_ICER7					( (__vo uint32_t*)0xE000E19C )
+
+
+/************************ END: Processor Specific Details **********************************/
+
+
 /*
  * Base addresses of Flash and SRAM memories
  * U means unsigned integer. Addresses are never signed.
@@ -36,6 +65,7 @@
 #define OTP_BASEADDR				0x1FFF7800U		/* One Time Programmable Memory Base Address: 528Bytes */
 
 #define SRAM 						SRAM1_BASEADDR
+
 
 /*
  * AHBx and APBx Peripheral Base Base Addresses
