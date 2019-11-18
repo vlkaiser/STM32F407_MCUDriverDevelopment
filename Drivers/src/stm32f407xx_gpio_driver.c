@@ -442,7 +442,7 @@ void GPIO_IRQPriorityConfig(uint8_t IRQ_Number, uint8_t IRQ_Priority)
  *
  * @brief				- Configure Interrupt Handling for a pin number
  *
- * @param[in]			-
+ * @param[in]			- pinNumber of IRQ
  * @param[in]			-
  * @param[in]			-
  *
@@ -452,5 +452,9 @@ void GPIO_IRQPriorityConfig(uint8_t IRQ_Number, uint8_t IRQ_Priority)
  **********************************************************************/
 void GPIO_IRQHandling(uint8_t pinNumber)
 {
-
+	if (EXTI->PR & (1 << pinNumber))
+	{
+		//Clear pending register bit
+		EXTI->PR |= ( 1 << pinNumber );
+	}
 }//GPIO_IRQHandling

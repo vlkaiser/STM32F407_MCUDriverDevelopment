@@ -40,4 +40,16 @@ void delay(void)
 int main(void)
 {
 
+	return 0;
+}
+
+void EXTI10_IRQHandler(void)
+{
+	//This overwrites the weak handler in the startup file
+
+	//Handle the interrupt
+	GPIO_IRQHandling(0);		//Takes in Pin Number for interrupt
+
+	//Is this address stored in the EXTI10 Fixed Vector Address?
+		//Yes.  The startup code actually takes care of this for us.
 }
