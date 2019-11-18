@@ -49,6 +49,12 @@
 #define NVIC_ICER6					( (__vo uint32_t*)0xE000E198 )
 #define NVIC_ICER7					( (__vo uint32_t*)0xE000E19C )
 
+ /*
+ * ARM Cortex M4 Processor NVIC IPR Register Addresses
+ */
+#define NVIC_IPR_BASE_ADDR			( (__vo uint32_t*)0xE000E400 )
+
+#define NO_PR_BITS_IMPLEMENTED		4
 
 /************************ END: Processor Specific Details **********************************/
 

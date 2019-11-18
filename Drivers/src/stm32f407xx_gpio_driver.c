@@ -357,19 +357,19 @@ void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t pinNumber)
 }//GPIO_ToggleOutputPin
 
 /**********************************************************************
- * @fn					- GPIO_IRQConfig
+ * @fn					- GPIO_IRQInterruptConfig
  *
  * @brief				- Configure Interrupt
  *
- * @param[in]			-
- * @param[in]			-
+ * @param[in]			- Interrupt Number
+ * @param[in]			- Enable or Disable
  * @param[in]			-
  *
  * @return				- void
  *
  * @note				-
  **********************************************************************/
-void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnorDi)
+void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 {
 	if(EnorDi == ENABLE)
 	{
@@ -412,6 +412,30 @@ void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnorDi)
 	}
 
 }//GPIO_IRQConfig
+
+/**********************************************************************
+ * @fn					- GPIO_IRQPriorityConfig
+ *
+ * @brief				- Configure Interrupt Priority for a pin number
+ *
+ * @param[in]			- IRQ Priority
+ * @param[in]			- IRQ Number
+ * @param[in]			-
+ *
+ * @return				- void
+ *
+ * @note				-
+ **********************************************************************/
+void GPIO_IRQPriorityConfig(uint8_t IRQ_Number, uint8_t IRQ_Priority)
+{
+	uint8_t iprx = ( IRQ_Number / 4 ) * 4;
+	uint8_t iprx_section = ( IRQ_Number % 4 );
+
+	//Left shift by IRQ byte + implemented priority range of byte.
+	uint8_t shift_by = (( 8 * iprx_section ) + ( 8 - NO_PR_BITS_IMPLEMENTED ));
+
+	*(NVIC_IPR_BASE_ADDR + iprx) |= ( IRQ_Priority << shift_by );
+}
 
 /**********************************************************************
  * @fn					- GPIO_IRQHandling
