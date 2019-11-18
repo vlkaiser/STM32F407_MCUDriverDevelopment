@@ -426,9 +426,9 @@ void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
  *
  * @note				-
  **********************************************************************/
-void GPIO_IRQPriorityConfig(uint8_t IRQ_Number, uint8_t IRQ_Priority)
+void GPIO_IRQPriorityConfig(uint8_t IRQ_Number, uint32_t IRQ_Priority)
 {
-	uint8_t iprx = ( IRQ_Number / 4 ) * 4;
+	uint8_t iprx = ( IRQ_Number / 4 );
 	uint8_t iprx_section = ( IRQ_Number % 4 );
 
 	//Left shift by IRQ byte + implemented priority range of byte.
