@@ -56,6 +56,37 @@
 
 #define NO_PR_BITS_IMPLEMENTED		4
 
+ /*
+ * ARM Cortex M4 Processor NVIC Priority Macros
+ */
+#define NVIC_IRQ_PRI_0				0
+#define NVIC_IRQ_PRI_1				1
+#define NVIC_IRQ_PRI_2				2
+#define NVIC_IRQ_PRI_3				3
+#define NVIC_IRQ_PRI_4				4
+#define NVIC_IRQ_PRI_5				5
+#define NVIC_IRQ_PRI_6				6
+#define NVIC_IRQ_PRI_7				7
+#define NVIC_IRQ_PRI_8				8
+#define NVIC_IRQ_PRI_9				9
+#define NVIC_IRQ_PRI_10				10
+#define NVIC_IRQ_PRI_11				11
+#define NVIC_IRQ_PRI_12				12
+#define NVIC_IRQ_PRI_13				13
+#define NVIC_IRQ_PRI_14				14
+#define NVIC_IRQ_PRI_15				15
+
+/*
+ * IRQ (Interrupt Request) Numbers for STM32F407x MCU
+ */
+#define IRQ_EXTI0		6
+#define IRQ_EXTI1		7
+#define IRQ_EXTI2		8
+#define IRQ_EXTI3		9
+#define IRQ_EXTI4		10
+#define IRQ_EXTI9_5		23
+#define IRQ_EXTI5_10	40
+
 /************************ END: Processor Specific Details **********************************/
 
 
@@ -131,17 +162,6 @@
 #define SPI1_BASEADDR				(APB2PERIPH_BASE + 0x3000U)		/* SPI1 Base Address */
 #define SYSCFG_BASEADDR				(APB2PERIPH_BASE + 0x3800U)		/* SYSCFG Base Address */
 #define EXTI_BASEADDR				(APB2PERIPH_BASE + 0x3C00U)		/* EXTI Base Address */
-
-/*
- * IRQ (Interrupt Request) Numbers for STM32F407x MCU
- */
-#define IRQ_EXTI0		6
-#define IRQ_EXTI1		7
-#define IRQ_EXTI2		8
-#define IRQ_EXTI3		9
-#define IRQ_EXTI4		10
-#define IRQ_EXTI9_5		23
-#define IRQ_EXTI5_10	40
 
 
 /*
