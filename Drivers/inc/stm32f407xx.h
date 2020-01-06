@@ -76,6 +76,9 @@
 #define NVIC_IRQ_PRI_14				14
 #define NVIC_IRQ_PRI_15				15
 
+
+/************************ TODO: PERIPHERAL INTERRUPTS **********************************/
+//ToDo: Configure SPI Interrupts
 /*
  * IRQ (Interrupt Request) Numbers for STM32F407x MCU
  */
@@ -90,6 +93,7 @@
 /************************ END: Processor Specific Details **********************************/
 
 
+/************************ TODO: PERIPHERAL BASE ADDRESSES **********************************/
 /*
  * Base addresses of Flash and SRAM memories
  * U means unsigned integer. Addresses are never signed.
@@ -160,9 +164,13 @@
 #define USART6_BASEADDR				(APB2PERIPH_BASE + 0x1400U)		/* USART6 Base Address */
 
 #define SPI1_BASEADDR				(APB2PERIPH_BASE + 0x3000U)		/* SPI1 Base Address */
+#define SPI4_BASEADDR				(APB2PERIPH_BASE + 0x3400U)		/* SPI4 Base Address */
+
 #define SYSCFG_BASEADDR				(APB2PERIPH_BASE + 0x3800U)		/* SYSCFG Base Address */
 #define EXTI_BASEADDR				(APB2PERIPH_BASE + 0x3C00U)		/* EXTI Base Address */
 
+
+/************************ TODO: PERIPHERAL REGISTER DEFINITIONS **********************************/
 
 /*
  * Peripheral Register Definition Structure for RCC
@@ -203,6 +211,35 @@ typedef struct
 	__vo uint32_t PLLI2SCFGR;	/*	RCC PLLI2S configuration register							Address Offset: 0x84	*/
 } RCC_RegDef_t;
 
+/*
+ * Peripheral Register Definition Structure for SYSCFG
+ * Example: SYSCFG_RegDef_t *pSYSCFG = (SYSCFG_RegDef_t*)SYSCFG_BASEADDR;
+ */
+typedef struct
+{
+	__vo uint32_t MEMRMP;		/*	SYSCFG Memory Remap Register							Address Offset: 0x00		*/
+	__vo uint32_t PMC;			/*	SYSCFG Peripheral Mode Config Register					Address Offset: 0x04		*/
+	__vo uint32_t EXTICR[4];	/*	SYSCFG External Interrupt Config 1..4 Registers			Address Offset: 0x08..0x14	*/
+	uint32_t RESERVED2[2];		/*  RESERVED 0x18-0x1C																	*/
+	__vo uint32_t CMPCR;		/*	Compensation Cell Control Register						Address Offset: 0x20		*/
+
+} SYSCFG_RegDef_t;
+
+
+/*
+ * Peripheral Register Definition Structure for EXTI (Interrupts)
+ * Example: EXTI_RegDef_t *pEXTI1 = (EXTI_RegDef_t*)EXTI1_BASEADDR;
+ */
+typedef struct
+{
+	__vo uint32_t IMR;		/*	EXTI Interrupt Mask Register					Address Offset: 0x00	*/
+	__vo uint32_t EMR;		/*	EXTI Event Mask Register						Address Offset: 0x04	*/
+	__vo uint32_t RTSR;		/*	EXTI Rising Trigger Selection Register			Address Offset: 0x08	*/
+	__vo uint32_t FTSR;		/*	EXTI Falling Trigger Selection Register			Address Offset: 0x0C	*/
+	__vo uint32_t SWIER;	/*	EXTI Software Interrupt Event  Register			Address Offset: 0x10	*/
+	__vo uint32_t PR;		/*	EXTI Pending Register							Address Offset: 0x14	*/
+
+} EXTI_RegDef_t;
 
 /*
  * Peripheral Register Definition Structure for GPIO
@@ -222,6 +259,57 @@ typedef struct
 } GPIO_RegDef_t;
 
 /*
+ * Peripheral Register Definition Structure for SPI
+ * Example: SPI_RegDef_t *pSPI = SPI;
+ */
+typedef struct
+{
+	__vo uint32_t SPI_CR1;		/*	SPI Control Register 1						Address Offset: 0x00	*/
+	__vo uint32_t SPI_CR2;		/*	SPI Control Register 2						Address Offset: 0x04	*/
+	__vo uint32_t SPI_SR;		/*	SPI Status Register							Address Offset: 0x08	*/
+	__vo uint32_t SPI_DR;		/*	SPI Data Register							Address Offset: 0x0C	*/
+	__vo uint32_t SPI_CRCPR;	/*	SPI CRC Polynomial Register					Address Offset: 0x10	*/
+	__vo uint32_t SPI_RXCRCR;	/*	SPI RX CRC Register							Address Offset: 0x14	*/
+	__vo uint32_t SPI_TXCRCR;	/*	SPI TX CRC Register							Address Offset: 0x18	*/
+	__vo uint32_t SPI_I2SCFGR;	/*	SPI I2S Configuration Register				Address Offset: 0x1C	*/
+	__vo uint32_t SPI_I2SPR;	/*	SPI I2S Prescaler Register					Address Offset: 0x20	*/
+} SPI_RegDef_t;
+
+/*
+ * Peripheral Register Definition Structure for I2C
+ * Example: I2C_RegDef_t *pI2C1 = (I2C_RegDef_t*)I2C1_BASEADDR;
+ */
+typedef struct
+{
+	__vo uint32_t CR1;		/*	I2C Control register 1					Address Offset: 0x00	*/
+	__vo uint32_t CR2;		/*	I2C Control register 2					Address Offset: 0x04	*/
+	__vo uint32_t OAR1;		/*	I2C Own address register 1				Address Offset: 0x08	*/
+	__vo uint32_t OAR2;		/*	I2C Own address register 2				Address Offset: 0x0C	*/
+	__vo uint32_t DR;		/*	I2C Data register						Address Offset: 0x10	*/
+	__vo uint32_t SR1;		/*	I2C Status register 1					Address Offset: 0x14	*/
+	__vo uint32_t SR2;		/*	I2C Status register 2					Address Offset: 0x18	*/
+	__vo uint32_t TRISE;	/*	I2C T-Rise register						Address Offset: 0x1C	*/
+	__vo uint32_t FLTR;		/*	I2C Filter register						Address Offset: 0x20	*/
+} I2C_RegDef_t;
+
+/*
+ * Peripheral Register Definition Structure for USART
+ * Example: USART_RegDef_t *pUSART1 = (USART_RegDef_t*)USART1_BASEADDR;
+ */
+typedef struct
+{
+	__vo uint32_t SR;		/*	USART Status register						Address Offset: 0x00	*/
+	__vo uint32_t DR;		/*	USART Data register							Address Offset: 0x04	*/
+	__vo uint32_t BRR;	/*	USART Baud rate register					Address Offset: 0x08	*/
+	__vo uint32_t CR1;	/*	USART Control register 1					Address Offset: 0x0C	*/
+	__vo uint32_t CR2;	/*	USART Control register 2					Address Offset: 0x10	*/
+	__vo uint32_t CR3;	/*	USART Control register 3					Address Offset: 0x14	*/
+	__vo uint32_t GTPR;	/*	USART Guard time and pre-scaler register		Address Offset: 0x18	*/
+} USART_RegDef_t;
+
+/************************ TODO: PERIPHERAL DEFINITIONS **********************************/
+
+/*
  * Peripheral Definitions (Peripheral Base Addresses Typecast to xxx_RegDef_t)
  */
 #define GPIOA	((GPIO_RegDef_t*)GPIOA_BASEADDR)
@@ -238,6 +326,13 @@ typedef struct
 
 #define EXTI	((EXTI_RegDef_t*)EXTI_BASEADDR)
 #define SYSCFG	((SYSCFG_RegDef_t*)SYSCFG_BASEADDR)
+
+#define SPI1	((SPI_RegDef_t*)SPI1_BASEADDR)
+#define SPI2	((SPI_RegDef_t*)SPI2_BASEADDR)
+#define SPI3	((SPI_RegDef_t*)SPI3_BASEADDR)
+#define SPI4	((SPI_RegDef_t*)SPI4_BASEADDR)
+
+/************************ TODO: PERIPHERAL CLOCK ENABLE/DISABLE DEFINITIONS **********************************/
 /*
  * Clock Enable Macros for GPIOx Peripherals
  */
@@ -264,6 +359,7 @@ typedef struct
 #define SPI1_PCLK_EN()	(RCC->APB2ENR |= ( 1 << 12))		/* SPI1 PERIPHERAL CLOCK ENABLE			*/
 #define SPI2_PCLK_EN()	(RCC->APB1ENR |= ( 1 << 14))		/* SPI2 PERIPHERAL CLOCK ENABLE			*/
 #define SPI3_PCLK_EN()	(RCC->APB1ENR |= ( 1 << 15))		/* SPI3 PERIPHERAL CLOCK ENABLE			*/
+#define SPI4_PCLK_EN()	(RCC->APB2ENR |= ( 1 << 13))		/* SPI4 PERIPHERAL CLOCK ENABLE			*/
 
 /*
  * Clock Enable Macros for USARTx Peripherals
@@ -307,6 +403,7 @@ typedef struct
 #define SPI1_PCLK_DI()	(RCC->APB2ENR &= ~( 1 << 12))		/* SPI1 PERIPHERAL CLOCK DISABLE			*/
 #define SPI2_PCLK_DI()	(RCC->APB1ENR &= ~( 1 << 14))		/* SPI2 PERIPHERAL CLOCK DISABLE			*/
 #define SPI3_PCLK_DI()	(RCC->APB1ENR &= ~( 1 << 15))		/* SPI3 PERIPHERAL CLOCK DISABLE			*/
+#define SPI4_PCLK_DI()	(RCC->APB2ENR &= ~( 1 << 13))		/* SPI4 PERIPHERAL CLOCK DISABLE			*/
 
 /*
  * Clock Disable Macros for USARTx Peripherals
@@ -337,7 +434,7 @@ typedef struct
 #define GPIOI_REG_RESET()		do{(RCC->AHB1RSTR |= ( 1 << 8)); (RCC->AHB1RSTR &= ~( 1 << 8));} while(0)
 
 /*
- *  GPIOx Port-to-PortCode Macro
+ *  GPIOx Port-to-Port Code Macro
  */
 #define GPIO_BASEADDR_TO_CODE(x)  ( (x == GPIOA) ? 0 : \
 									(x == GPIOB) ? 1 : \
@@ -348,92 +445,14 @@ typedef struct
 									(x == GPIOG) ? 6 : \
 									(x == GPIOH) ? 7 : 0 )
 
-/*
- * Peripheral Register Definition Structure for SYSCFG
- * Example: SYSCFG_RegDef_t *pSYSCFG = (SYSCFG_RegDef_t*)SYSCFG_BASEADDR;
- */
-typedef struct
-{
-	__vo uint32_t MEMRMP;		/*	SYSCFG Memory Remap Register							Address Offset: 0x00		*/
-	__vo uint32_t PMC;			/*	SYSCFG Peripheral Mode Config Register					Address Offset: 0x04		*/
-	__vo uint32_t EXTICR[4];	/*	SYSCFG External Interrupt Config 1..4 Registers			Address Offset: 0x08..0x14	*/
-	uint32_t RESERVED2[2];		/*  RESERVED 0x18-0x1C																	*/
-	__vo uint32_t CMPCR;		/*	Compensation Cell Control Register						Address Offset: 0x20		*/
-
-} SYSCFG_RegDef_t;
 
 
-
-
-/*
- * Peripheral Register Definition Structure for EXTI (Interrupts)
- * Example: EXTI_RegDef_t *pEXTI1 = (EXTI_RegDef_t*)EXTI1_BASEADDR;
- */
-typedef struct
-{
-	__vo uint32_t IMR;		/*	EXTI Interrupt Mask Register					Address Offset: 0x00	*/
-	__vo uint32_t EMR;		/*	EXTI Event Mask Register						Address Offset: 0x04	*/
-	__vo uint32_t RTSR;		/*	EXTI Rising Trigger Selection Register			Address Offset: 0x08	*/
-	__vo uint32_t FTSR;		/*	EXTI Falling Trigger Selection Register			Address Offset: 0x0C	*/
-	__vo uint32_t SWIER;	/*	EXTI Software Interrupt Event  Register			Address Offset: 0x10	*/
-	__vo uint32_t PR;		/*	EXTI Pending Register							Address Offset: 0x14	*/
-
-} EXTI_RegDef_t;
-
-/*
- * Peripheral Register Definition Structure for SPI
- * Example: SPI_RegDef_t *pSPI1 = (SPI_RegDef_t*)SPI1_BASEADDR;
- */
-typedef struct
-{
-	__vo uint32_t CR1;		/*	SPI Control 1 Register					Address Offset: 0x00	*/
-	__vo uint32_t CR2;		/*	SPI Control 2 Register					Address Offset: 0x04	*/
-	__vo uint32_t SR;		/*	SPI Status Register						Address Offset: 0x08	*/
-	__vo uint32_t DR;		/*	SPI Data Register						Address Offset: 0x0C	*/
-	__vo uint32_t CRCPR;	/*	SPI CRC Polynomial  Register			Address Offset: 0x10	*/
-	__vo uint32_t RXCRCR;	/*	SPI RX CRC Register						Address Offset: 0x14	*/
-	__vo uint32_t TXCRCR;	/*	SPI TX CRC Register						Address Offset: 0x18	*/
-	__vo uint32_t I2SCFGR;	/*	SPI I2S Configuration Register			Address Offset: 0x1C	*/
-	__vo uint32_t I2SPR;	/*	SPI I2S Prescaler Register				Address Offset: 0x20	*/
-} SPI_RegDef_t;
-
-/*
- * Peripheral Register Definition Structure for I2C
- * Example: I2C_RegDef_t *pI2C1 = (I2C_RegDef_t*)I2C1_BASEADDR;
- */
-typedef struct
-{
-	__vo uint32_t CR1;		/*	I2C Control register 1					Address Offset: 0x00	*/
-	__vo uint32_t CR2;		/*	I2C Control register 2					Address Offset: 0x04	*/
-	__vo uint32_t OAR1;		/*	I2C Own address register 1				Address Offset: 0x08	*/
-	__vo uint32_t OAR2;		/*	I2C Own address register 2				Address Offset: 0x0C	*/
-	__vo uint32_t DR;		/*	I2C Data register						Address Offset: 0x10	*/
-	__vo uint32_t SR1;		/*	I2C Status register 1					Address Offset: 0x14	*/
-	__vo uint32_t SR2;		/*	I2C Status register 2					Address Offset: 0x18	*/
-	__vo uint32_t TRISE;	/*	I2C T-Rise register						Address Offset: 0x1C	*/
-	__vo uint32_t FLTR;		/*	I2C Filter register						Address Offset: 0x20	*/
-} I2C_RegDef_t;
-
-/*
- * Peripheral Register Definition Structure for USART
- * Example: USART_RegDef_t *pUSART1 = (USART_RegDef_t*)USART1_BASEADDR;
- */
-typedef struct
-{
-	__vo uint32_t SR;		/*	USART Status register						Address Offset: 0x00	*/
-	__vo uint32_t DR;		/*	USART Data register							Address Offset: 0x04	*/
-	__vo uint32_t BRR;	/*	USART Baud rate register					Address Offset: 0x08	*/
-	__vo uint32_t CR1;	/*	USART Control register 1					Address Offset: 0x0C	*/
-	__vo uint32_t CR2;	/*	USART Control register 2					Address Offset: 0x10	*/
-	__vo uint32_t CR3;	/*	USART Control register 3					Address Offset: 0x14	*/
-	__vo uint32_t GTPR;	/*	USART Guard time and pre-scaler register		Address Offset: 0x18	*/
-} USART_RegDef_t;
-
-
+/************************ TODO: INCLUDE PERIPHERAL HEADER FILES **********************************/
 /*
  * Peripheral Header Files
  */
 #include "stm32f407xx_gpio_driver.h"
+#include "stm32f407xx_spi_driver.h"
 
 #endif /* INC_STM32F407XX_H_ */
 
