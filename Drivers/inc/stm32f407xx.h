@@ -23,6 +23,8 @@
 #define RESET			DISABLE
 #define GPIO_PIN_SET	SET
 #define GPIO_PIN_RESET	RESET
+#define FLAG_RESET		RESET
+#define FLAG_SET		SET
 
 /************************ START: Processor Specific Details **********************************/
  /*
@@ -445,6 +447,50 @@ typedef struct
 									(x == GPIOG) ? 6 : \
 									(x == GPIOH) ? 7 : 0 )
 
+/*
+ * Reset SPIx Peripheral Macros
+ */
+#define SPI1_REG_RESET()		do{(RCC->APB2RSTR |= ( 1 << 12)); (RCC->AHB2RSTR &= ~( 1 << 12));} while(0)
+#define SPI2_REG_RESET()		do{(RCC->APB1RSTR |= ( 1 << 14)); (RCC->AHB1RSTR &= ~( 1 << 14));} while(0)
+#define SPI3_REG_RESET()		do{(RCC->APB1RSTR |= ( 1 << 15)); (RCC->AHB1RSTR &= ~( 1 << 15));} while(0)
+#define SPI4_REG_RESET()		do{(RCC->APB2RSTR |= ( 1 << 13)); (RCC->AHB2RSTR &= ~( 1 << 13));} while(0)
+
+/************************ TODO: PERIPHERAL BIT POSITION DEFINITIONS **********************************/
+/**********************************************
+ * Bit Position Definitions for SPI Peripheral
+ **********************************************/
+#define SPI_CR1_BIDIMODE	15
+#define SPI_CR1_BIDIOE		14
+#define SPI_CR1_CRCEN		13
+#define SPI_CR1_CRCNEXT		12
+#define SPI_CR1_DFF			11
+#define SPI_CR1_RXONLY		10
+#define SPI_CR1_SSM			9
+#define SPI_CR1_SSI			8
+#define SPI_CR1_LSBFIRST	7
+#define SPI_CR1_SPE			6
+#define SPI_CR1_BR			3
+#define SPI_CR1_MSTR		2
+#define SPI_CR1_CPOL		1
+#define SPI_CR1_CPHA		0
+
+#define SPI_CR2_TXEIE		7
+#define SPI_CR2_RXNIE		6
+#define SPI_CR2_ERRIE		5
+#define SPI_CR2_FRF			4
+#define SPI_CR2_SSOE		2
+#define SPI_CR2_TXDMAEN		1
+#define SPI_CR2_RXDMAEN		0
+
+#define SPI_SR_FRE			8
+#define SPI_SR_BSY			7
+#define SPI_SR_OVR			6
+#define SPI_SR_MODF			5
+#define SPI_SR_CRCERR		4
+#define SPI_SR_UDR			3
+#define SPI_SR_CHSIDE		2
+#define SPI_SR_TXE			1
+#define SPI_SR_RXNE			0
 
 
 /************************ TODO: INCLUDE PERIPHERAL HEADER FILES **********************************/
