@@ -71,7 +71,7 @@ void SPI2_GPIOInits(void)
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_12;
 	GPIO_Init(&GPIO_SPIPins);
 
-	GPIO_PeriClockCtrl(GPIOB, ENABLE);		//Initialize Peripheral Clock
+	//GPIO_PeriClockCtrl(GPIOB, ENABLE);		//Initialize Peripheral Clock
 
 }
 
@@ -90,7 +90,7 @@ void SPI2_Inits(void)
 
 	SPI_Init(&SPI2Handle);
 
-	SPI_PeriClockCtrl(SPI2, ENABLE);		//Initialize Peripheral Clock
+	//SPI_PeriClockCtrl(SPI2, ENABLE);		//Initialize Peripheral Clock
 
 }
 
