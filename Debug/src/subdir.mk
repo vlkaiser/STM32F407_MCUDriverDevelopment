@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/005_Interrupt_Btn2.c 
+../src/006_SPI_TxData.c 
 
 OBJS += \
-./src/005_Interrupt_Btn2.o 
+./src/006_SPI_TxData.o 
 
 C_DEPS += \
-./src/005_Interrupt_Btn2.d 
+./src/006_SPI_TxData.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
