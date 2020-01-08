@@ -148,6 +148,30 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx)
 
 }//SPI_DeInit
 
+/**********************************************************************
+ * @fn					- SPI_PeripheralControl
+ *
+ * @brief				- Enable or Disable SPI peripheral
+ *
+ * @param[in]			- Base address of GPIO peripheral Ex: pSPIx = SPI1
+ * @param[in]			- Enable or Disable
+ *
+ * @return				- void
+ *
+ * @note				-
+ **********************************************************************/
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
+{
+	if( EnorDi == ENABLE )
+	{
+		pSPIx->SPI_CR1 |= ( 1 << SPI_CR1_SPE );		//Set SPE bit to 1, Enable
+	}else
+	{
+		pSPIx->SPI_CR1 &= ~( 1 << SPI_CR1_SPE );	//Clear SPE bit, Disable
+	}
+
+}
+
 /***************************************************************************************************
  * @fn					- SPI_SendData
  *

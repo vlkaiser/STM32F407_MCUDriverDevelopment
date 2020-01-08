@@ -129,7 +129,7 @@ void SPI_IRQHandling(SPI_Handle_t *pSPIHandle);										/*!< Configure Interrup
  * Other Peripheral Control APIs
  */
 uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t flagName );					/*!< Get status register flag state >*/
-
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
 
 
 #endif /* SRC_STM32F407XX_SPI_DRIVER_H_ */

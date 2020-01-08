@@ -59,19 +59,23 @@ void SPI2_GPIOInits(void)
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_15;
 	GPIO_Init(&GPIO_SPIPins);
 
-	// MISO
+	// MISO - Unused in this application
+	/*
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_14;
 	GPIO_Init(&GPIO_SPIPins);
+	 */
 
 	// SCLK
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_13;
 	GPIO_Init(&GPIO_SPIPins);
 
-	// NSS
+	// NSS - Unused in this application
+	/*
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_12;
 	GPIO_Init(&GPIO_SPIPins);
+	 */
 
-	//GPIO_PeriClockCtrl(GPIOB, ENABLE);		//Initialize Peripheral Clock
+	//GPIO_PeriClockCtrl(GPIOB, ENABLE);		//Initialize Peripheral Clock - moved into driver
 
 }
 
@@ -90,23 +94,28 @@ void SPI2_Inits(void)
 
 	SPI_Init(&SPI2Handle);
 
-	//SPI_PeriClockCtrl(SPI2, ENABLE);		//Initialize Peripheral Clock
+	//SPI_PeriClockCtrl(SPI2, ENABLE);		//Initialize Peripheral Clock - moved into driver
 
 }
 
 int main(void)
 {
+	char user_data[] = "Hello World!";		//Data to Send
+
 	//Initialize the GPIO Pins to act as SPI2 pins
 	SPI2_GPIOInits();
 
 	//Initialize the SPI peripheral
 	SPI2_Inits();
 
-	//SPI_Handle - set parameters *pSPIHandle
-	//SPI_Init - send SPI_Handle: SPI_Init(SPI_Handle_t *pSPIHandle)
+	//Enable SPI2 Peripheral
+	SPI_PeripheralControl(SPI2, ENABLE);
+
 	//SPI_SendData: SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len)
+	//SPI_SendData( SPI2, user_data, strlen(user_data) );			//NOTE: *pTXBuffer is uint8_t, and user_data is char.  Must TYPECAST
+	SPI_SendData( SPI2, (uint8_t*)user_data, strlen(user_data) );
 
-
+	while(1);	//hang application
 
 	return 0;
 }
