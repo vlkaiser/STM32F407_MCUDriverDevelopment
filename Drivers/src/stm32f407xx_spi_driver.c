@@ -121,7 +121,7 @@ void SPI_Init(SPI_Handle_t *pSPIHandle)
  *
  * @brief				- De-Initialize the registers of the given SPI (Reset to default)
  *
- * @param[in]			- Base address of GPIO peripheral Ex: pSPIx = SPIA
+ * @param[in]			- Base address of SPI peripheral Ex: pSPIx = SPIA
  * @param[in]			-
  *
  * @return				- void
@@ -153,7 +153,7 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx)
  *
  * @brief				- Enable or Disable SPI peripheral
  *
- * @param[in]			- Base address of GPIO peripheral Ex: pSPIx = SPI1
+ * @param[in]			- Base address of SPI peripheral Ex: pSPIx = SPI1
  * @param[in]			- Enable or Disable
  *
  * @return				- void
@@ -170,14 +170,38 @@ void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
 		pSPIx->SPI_CR1 &= ~( 1 << SPI_CR1_SPE );	//Clear SPE bit, Disable
 	}
 
-}
+}//SPI_PeripheralControl
+
+/**********************************************************************
+ * @fn					- SPI_SSIConfig
+ *
+ * @brief				- Enable or Disable SPI peripheral Internal Slave Select
+ *
+ * @param[in]			- Base address of SPI peripheral Ex: pSPIx = SPI1
+ * @param[in]			- Enable or Disable
+ *
+ * @return				- void
+ *
+ * @note				- If SSI is LOW (SW Mode), OR NSS is LOW (HW Mode), MODF will not allow SPI MSTR or SPE set
+ **********************************************************************/
+void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
+{
+	if( EnorDi == ENABLE )
+	{
+		pSPIx->SPI_CR1 |= ( 1 << SPI_CR1_SSI );		//Set SSI bit to 1, Enable
+	}else
+	{
+		pSPIx->SPI_CR1 &= ~( 1 << SPI_CR1_SSI );	//Clear SSI bit, Disable
+	}
+
+}//SPI_SSIConfig
 
 /***************************************************************************************************
  * @fn					- SPI_SendData
  *
  * @brief				- Data structure Base Address, Data and length to TX Data
  *
- * @param[in]			- Base address of GPIO peripheral Ex: pSPIx = SPIA
+ * @param[in]			- Base address of SPI peripheral Ex: pSPIx = SPIA
  * @param[in]			- Buffer of Data to Send
  * @param[in]			- Data Length
  *

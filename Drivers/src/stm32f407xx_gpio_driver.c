@@ -191,9 +191,12 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
 		temp1 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber / 8;						// Determine AFR register.  0 = low, 1 = high
 		temp2 =  pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber % 8;					// Determine register position
 
-		temp = pGPIOHandle->GPIO_PinConfig.GPIO_PinAltFncMode << (4 * temp2);		// Shift the ALT FUNCTION MODE by 4 respective to register, pin number
-		pGPIOHandle->pGPIOx->AFR[temp] &= ~(0xF << (4 * temp2));					// Clear AFR
-		pGPIOHandle->pGPIOx->AFR[temp] |= temp2;									// Write to appropriate register
+		//temp = pGPIOHandle->GPIO_PinConfig.GPIO_PinAltFncMode << (4 * temp2);		// Shift the ALT FUNCTION MODE by 4 respective to register, pin number
+		//pGPIOHandle->pGPIOx->AFR[temp] &= ~( 0xF << (4 * temp2) );					// Clear AFR
+		//pGPIOHandle->pGPIOx->AFR[temp] |= temp2;									// Write to appropriate register
+
+		pGPIOHandle->pGPIOx->AFR[temp1] &= ~( 0xF << (4 * temp2) );							// Clear AFR
+		pGPIOHandle->pGPIOx->AFR[temp1] |= ( pGPIOHandle->GPIO_PinConfig.GPIO_PinAltFncMode << (4 * temp2) );			// Write AF code to appropriate register
 
 		temp = temp1 = temp2 = 0;				//clear temp
 	}

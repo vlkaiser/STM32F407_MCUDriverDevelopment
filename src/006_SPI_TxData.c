@@ -55,25 +55,25 @@ void SPI2_GPIOInits(void)
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinPuPdCtrl = GPIO_NO_PUPD;
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
 
+	// SCLK
+	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_10;
+	GPIO_Init(&GPIO_SPIPins);
+
 	// MOSI
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_15;
 	GPIO_Init(&GPIO_SPIPins);
 
 	// MISO - Unused in this application
-	/*
+
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_14;
 	GPIO_Init(&GPIO_SPIPins);
-	 */
 
-	// SCLK
-	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_13;
-	GPIO_Init(&GPIO_SPIPins);
 
 	// NSS - Unused in this application
-	/*
+
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_12;
 	GPIO_Init(&GPIO_SPIPins);
-	 */
+
 
 	//GPIO_PeriClockCtrl(GPIOB, ENABLE);		//Initialize Peripheral Clock - moved into driver
 
@@ -90,7 +90,7 @@ void SPI2_Inits(void)
 	SPI2Handle.SPIConfig.SPI_DFF = SPI_DFF_8BITS;
 	SPI2Handle.SPIConfig.SPI_DeviceMode = SPI_DEVICE_MODE_MASTER;
 	SPI2Handle.SPIConfig.SPI_SSM = SPI_SSM_EN;					//Software Slave Managed for NSS
-	SPI2Handle.SPIConfig.SPI_SclkSpeed = SPI_SCLK_SPEED_DIV2;	//SCLK 8MHz
+	SPI2Handle.SPIConfig.SPI_SclkSpeed = SPI_SCLK_SPEED_DIV2;	//SCLK
 
 	SPI_Init(&SPI2Handle);
 
@@ -107,6 +107,9 @@ int main(void)
 
 	//Initialize the SPI peripheral
 	SPI2_Inits();
+
+	//Pulls NSS signal internally high to enable MSTR/SPE config
+	SPI_SSIConfig(SPI2, ENABLE);
 
 	//Enable SPI2 Peripheral
 	SPI_PeripheralControl(SPI2, ENABLE);
