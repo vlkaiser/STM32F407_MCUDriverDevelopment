@@ -86,7 +86,7 @@ void SPI2_Inits(void)
 	SPI2Handle.pSPIx = SPI2;
 	SPI2Handle.SPIConfig.SPI_BusConfig = SPI_BUS_CONFIG_FD;
 	SPI2Handle.SPIConfig.SPI_CPHA = SPI_CPHA_LOW;				//Default
-	SPI2Handle.SPIConfig.SPI_CPOL = SPI_CPOL_LOW;				//Default
+	SPI2Handle.SPIConfig.SPI_CPOL = SPI_CPOL_LOW;				//Default - idle state, clock is low
 	SPI2Handle.SPIConfig.SPI_DFF = SPI_DFF_8BITS;
 	SPI2Handle.SPIConfig.SPI_DeviceMode = SPI_DEVICE_MODE_MASTER;
 	SPI2Handle.SPIConfig.SPI_SSM = SPI_SSM_EN;					//Software Slave Managed for NSS
@@ -117,6 +117,9 @@ int main(void)
 	//SPI_SendData: SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len)
 	//SPI_SendData( SPI2, user_data, strlen(user_data) );			//NOTE: *pTXBuffer is uint8_t, and user_data is char.  Must TYPECAST
 	SPI_SendData( SPI2, (uint8_t*)user_data, strlen(user_data) );
+
+	//Disable the peripheral - return to Idle state
+	SPI_PeripheralControl(SPI2, DISABLE);
 
 	while(1);	//hang application
 

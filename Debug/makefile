@@ -31,10 +31,10 @@ endif
 all: STM32F407_Drivers.elf
 
 # Tool invocations
-STM32F407_Drivers.elf: $(OBJS) $(USER_OBJS) C:\Users\vkaiser\Documents\_STM32LocalRepository\STM32F407_Drivers/LinkerScript.ld
+STM32F407_Drivers.elf: $(OBJS) $(USER_OBJS) C:\Users\infin\Documents\_LocalRepo\STMicro\STM32F407_MCUDriverDevelopment/LinkerScript.ld
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"C:/Users/vkaiser/Documents/_STM32LocalRepository/STM32F407_Drivers/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "STM32F407_Drivers.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"C:/Users/infin/Documents/_LocalRepo/STMicro/STM32F407_MCUDriverDevelopment/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "STM32F407_Drivers.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
