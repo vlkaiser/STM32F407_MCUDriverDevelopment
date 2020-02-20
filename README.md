@@ -22,4 +22,10 @@ Test Project to validate drivers by reading input pin button state, and toggling
 
 ### 004_Interrupt_Btn.c
 Test Project to validate drivers reading input state of a button, generating an interrupt, and handling it to toggle an LED.
+
+### 005_Interrupt_Btn2.c
+Test Project to validate drivers generating an interrupt on button press, and handling it to toggle an LED - using configured GPIO settings.
+
+### 006_SPI_TxData.c
+Test Project to validate drivers for SPI communications.  Send 'Hello World'
 **In progress**
