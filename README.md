@@ -28,4 +28,8 @@ Test Project to validate drivers generating an interrupt on button press, and ha
 
 ### 006_SPI_TxData.c
 Test Project to validate drivers for SPI communications.  Send 'Hello World'
+
+### 007_SPI_Arduino_SL
+Test project using the STM32407 as the SPI Master, and an Arduino as the SPI Slave.  And snickering at the 007/SPI puns.
+SPI in full duplex, DFF=0, SSM=0, SCLK = 2MHz, fclk = 16MHz.  Arduino does not return data -> MISO not required.
 **In progress**
