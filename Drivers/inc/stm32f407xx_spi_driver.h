@@ -51,6 +51,7 @@ typedef struct
 
 /*
  * @SPI_SclkSpeed	//SPI_CR1 BaudRate [BR]
+ * HSI Clock (System Clock) = 16MHz
  */
 #define SPI_SCLK_SPEED_DIV2						0		/* fpclk/2		*/
 #define SPI_SCLK_SPEED_DIV4						1		/* fpclk/4		*/
