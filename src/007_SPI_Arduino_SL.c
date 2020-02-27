@@ -58,7 +58,7 @@ void SPI2_GPIOInits(void)
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinAltFncMode = 5;
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
-	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinPuPdCtrl = GPIO_NO_PUPD;
+	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinPuPdCtrl = GPIO_PIN_PU;		//because we have a slave connected, PullUp
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
 
 	// SCLK
@@ -120,7 +120,8 @@ void GPIO_ButtonInit(void)
 
 int main(void)
 {
-	char user_data[] = "Hello World!";		//Data to Send
+	//char user_data[] = "Hello World!";		//Data to Send
+	char user_data[] = "We now have a lot of data to send across the SPI interface!";		//Data to Send
 
 	//Init Button
 	GPIO_ButtonInit();
