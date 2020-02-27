@@ -99,12 +99,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.1209615890.513237156" name="007_SPI_Arduino_SL.c" rcbsApplicability="disable" resourcePath="src/007_SPI_Arduino_SL.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.162300840.977863485">
-						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.162300840.977863485" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.162300840">
-							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.833054616" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
-							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.88644718" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
-						</tool>
-					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="006_SPI_TxData.c|005_Interrupt_Btn2.c|002_LED_Btn.c|004_Interrupt_Btn.c|003_Ext_LED_Btn.c|001_LED_Toggle.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>

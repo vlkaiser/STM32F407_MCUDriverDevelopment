@@ -196,6 +196,30 @@ void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
 
 }//SPI_SSIConfig
 
+/**********************************************************************
+ * @fn					- SPI_SSOEConfig
+ *
+ * @brief				- Enable or Disable SPI peripheral Internal Slave Select Output Enable
+ *
+ * @param[in]			- Base address of SPI peripheral Ex: pSPIx = SPI1
+ * @param[in]			- Enable or Disable
+ *
+ * @return				- void
+ *
+ * @note				- If MCU is Master, SSOE Enables NSS with automatic hardware slave select control (SPE)
+ **********************************************************************/
+void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
+{
+	if( EnorDi == ENABLE )
+	{
+		pSPIx->SPI_CR2 |= ( 1 << SPI_CR2_SSOE );		//Set SSI bit to 1, Enable
+	}else
+	{
+		pSPIx->SPI_CR2 &= ~( 1 << SPI_CR2_SSOE );	//Clear SSI bit, Disable
+	}
+
+}//SPI_SSOEConfig
+
 /***************************************************************************************************
  * @fn					- SPI_SendData
  *

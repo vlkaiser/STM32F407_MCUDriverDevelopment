@@ -118,6 +118,10 @@ int main(void)
 	//SPI_SendData( SPI2, user_data, strlen(user_data) );			//NOTE: *pTXBuffer is uint8_t, and user_data is char.  Must TYPECAST
 	SPI_SendData( SPI2, (uint8_t*)user_data, strlen(user_data) );
 
+	/* Before we Close SPI we must make sure SPI is not BUSY [BSY = 0] by checking the SPI Status BSY flag */
+	// Wait for busy flag != 1
+	while( SPI_GetFlagStatus(SPI2, SPI_BSY_FLAG) );
+
 	//Disable the peripheral - return to Idle state
 	SPI_PeripheralControl(SPI2, DISABLE);
 

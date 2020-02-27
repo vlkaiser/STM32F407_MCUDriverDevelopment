@@ -31,6 +31,10 @@
 #include "stm32f407xx.h"
 #include "string.h"
 
+#define BTN_PRESSED			HIGH		//HIGH defined in stm32f407xx.h as ENABLE or 1
+
+void GPIO_ButtonInit(void);
+
 /* Software Delay Function */
 void delay(void)
 {
@@ -44,7 +48,7 @@ void SPI2_GPIOInits(void)
 	/*
 	 * PB15 - SPI2_MOSI -> Arduino 11
 	 * PB14 - SPI2_MISO -> Not Used
-	 * PB13 - SPI2_SCLK -> Arduino 13
+	 * PB10 - SPI2_SCLK -> Arduino 13
 	 * PB12 - SPI2_NSS  -> 10
 	 * AF Mode: 5
 	 */
@@ -66,13 +70,11 @@ void SPI2_GPIOInits(void)
 	GPIO_Init(&GPIO_SPIPins);
 
 	// MISO - Unused in this application
-
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_14;
 	GPIO_Init(&GPIO_SPIPins);
 
 
-	// NSS - Unused in this application
-
+	// NSS - Used in this application
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_12;
 	GPIO_Init(&GPIO_SPIPins);
 
@@ -100,9 +102,28 @@ void SPI2_Inits(void)
 
 }
 
+void GPIO_ButtonInit(void)
+{
+	/* Button Configuration */
+	GPIO_Handle_t gpioBtn;										//Initialize Handler
+
+	gpioBtn.pGPIOx = GPIOA;										// Point to Port A
+
+	gpioBtn.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_0;			// Config pin 0
+	gpioBtn.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IN;			// Output Mode
+	gpioBtn.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;		// Fast (Normal)
+	gpioBtn.GPIO_PinConfig.GPIO_PinPuPdCtrl = GPIO_NO_PUPD;		// Schematic PullDown Resistor.
+
+	GPIO_Init(&gpioBtn);										//Initialize Pin 0
+}
+
+
 int main(void)
 {
 	char user_data[] = "Hello World!";		//Data to Send
+
+	//Init Button
+	GPIO_ButtonInit();
 
 	//Initialize the GPIO Pins to act as SPI2 pins
 	SPI2_GPIOInits();
@@ -110,24 +131,50 @@ int main(void)
 	//Initialize the SPI peripheral
 	SPI2_Inits();
 
-	//Enable SPI2 Peripheral
-	SPI_PeripheralControl(SPI2, ENABLE);
+	/***
+	* Set the Slave Select Output Enable to 1 (Master Mode MCU)
+	* SSOE EN = NSS Output Enable
+	* NSS pin is automatically managed by the hardware: (SS Active High, MOSI Active High)
+	*	eg SPE = 1, NSS = LOW
+	*	   SPE = 0, NSS = HIGH
+	***/
+	SPI_SSOEConfig(SPI2, ENABLE);
 
-	//SPI_SendData: SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len)
-	//SPI_SendData( SPI2, user_data, strlen(user_data) );			//NOTE: *pTXBuffer is uint8_t, and user_data is char.  Must TYPECAST
-	SPI_SendData( SPI2, (uint8_t*)user_data, strlen(user_data) );
+	while(1)
+	{
+		//Wait for Button Press:
+		while( ! GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_0) );
 
-	//Disable the peripheral - return to Idle state
-	SPI_PeripheralControl(SPI2, DISABLE);
+		delay();		//debounce delay
 
-	//Hardware Slave Select
-	//The slave will not respond unless SS on the slave is pulled to low.
-	//SSM = 0 (disabled), SPE = 1, NSS (Slave select) will be low automatically
-	//SSM = 1, SPE = 0, NSS will be high automatically
-	//In order to ENABLE the NSS we need the SSOE control bit to be enabled.
+		//Enable SPI2 Peripheral
+		SPI_PeripheralControl(SPI2, ENABLE);
+
+		//First send the LENGTH or # of Bytes information so the Slave knows how many bytes to receive.
+		uint8_t dataLen = strlen(user_data);
+		SPI_SendData( SPI2, &dataLen, 1 );
+
+		//Then send the DATA
+		//SPI_SendData: SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len)
+		//SPI_SendData( SPI2, user_data, strlen(user_data) );			//NOTE: *pTXBuffer is uint8_t, and user_data is char.  Must TYPECAST
+		SPI_SendData( SPI2, (uint8_t*)user_data, strlen(user_data) );
 
 
-	while(1);	//hang application
+		/* Before we Close SPI we must make sure SPI is not BUSY [BSY = 0] by checking the SPI Status BSY flag */
+		// Wait for busy flag != 1
+		while( SPI_GetFlagStatus(SPI2, SPI_BSY_FLAG) );
+
+		//Disable the peripheral - return to Idle state
+		SPI_PeripheralControl(SPI2, DISABLE);
+
+		//Hardware Slave Select
+		//The slave will not respond unless SS on the slave is pulled to low.
+		//SSM = 0 (disabled), SPE = 1, NSS (Slave select) will be low automatically
+		//SSM = 1, SPE = 0, NSS will be high automatically
+		//In order to ENABLE the NSS we need the SSOE control bit to be enabled.
+
+	}
 
 	return 0;
 }
+
