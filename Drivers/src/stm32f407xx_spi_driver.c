@@ -352,7 +352,7 @@ void SPI_IRQHandling(SPI_Handle_t *pSPIHandle)
  *
  * @return				- void
  *
- * @note				-
+ * @note				- Flag set and cleared by the hardware
  **********************************************************************/
 uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t flagName )
 {

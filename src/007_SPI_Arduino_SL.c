@@ -55,10 +55,11 @@ void SPI2_GPIOInits(void)
 	GPIO_Handle_t GPIO_SPIPins;
 
 	GPIO_SPIPins.pGPIOx = GPIOB;
-	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinAltFncMode = 5;
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
+	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinAltFncMode = 5;
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
-	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinPuPdCtrl = GPIO_PIN_PU;		//because we have a slave connected, PullUp
+	//GPIO_SPIPins.GPIO_PinConfig.GPIO_PinPuPdCtrl = GPIO_PIN_PU;		//because we have a slave connected, PullUp
+	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinPuPdCtrl = GPIO_NO_PUPD;
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
 
 	// SCLK
@@ -70,11 +71,11 @@ void SPI2_GPIOInits(void)
 	GPIO_Init(&GPIO_SPIPins);
 
 	// MISO - Unused in this application
-	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_14;
-	GPIO_Init(&GPIO_SPIPins);
+	//GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_14;
+	//GPIO_Init(&GPIO_SPIPins);
 
 
-	// NSS - Used in this application
+	// NSS - Used in this application - Ahrdware slave control
 	GPIO_SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_12;
 	GPIO_Init(&GPIO_SPIPins);
 
@@ -89,12 +90,13 @@ void SPI2_Inits(void)
 
 	SPI2Handle.pSPIx = SPI2;
 	SPI2Handle.SPIConfig.SPI_BusConfig = SPI_BUS_CONFIG_FD;
-	SPI2Handle.SPIConfig.SPI_CPHA = SPI_CPHA_LOW;				//Default
-	SPI2Handle.SPIConfig.SPI_CPOL = SPI_CPOL_LOW;				//Default - idle state, clock is low
-	SPI2Handle.SPIConfig.SPI_DFF = SPI_DFF_8BITS;
 	SPI2Handle.SPIConfig.SPI_DeviceMode = SPI_DEVICE_MODE_MASTER;
-	SPI2Handle.SPIConfig.SPI_SSM = SPI_SSM_DI;					//Hardware Slave Managed via Arduino so NSS disabled
 	SPI2Handle.SPIConfig.SPI_SclkSpeed = SPI_SCLK_SPEED_DIV8;	//SCLK = 2MHZ, divide HSI SCLK by 8
+	SPI2Handle.SPIConfig.SPI_DFF = SPI_DFF_8BITS;
+	SPI2Handle.SPIConfig.SPI_CPOL = SPI_CPOL_LOW;				//Default - idle state, clock is low
+	SPI2Handle.SPIConfig.SPI_CPHA = SPI_CPHA_LOW;				//Default
+	SPI2Handle.SPIConfig.SPI_SSM = SPI_SSM_DI;					//Hardware Slave Managed via Arduino so NSS Enabled
+
 
 	SPI_Init(&SPI2Handle);
 
@@ -114,7 +116,7 @@ void GPIO_ButtonInit(void)
 	gpioBtn.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;		// Fast (Normal)
 	gpioBtn.GPIO_PinConfig.GPIO_PinPuPdCtrl = GPIO_NO_PUPD;		// Schematic PullDown Resistor.
 
-	GPIO_Init(&gpioBtn);										//Initialize Pin 0
+	GPIO_Init(&gpioBtn);										//Initialize Pin 0, initializes peripheral clock control
 }
 
 
@@ -123,7 +125,7 @@ int main(void)
 	//char user_data[] = "Hello World!";		//Data to Send
 	char user_data[] = "We now have a lot of data to send across the SPI interface!";		//Data to Send
 
-	//Init Button
+	//Init Push Button
 	GPIO_ButtonInit();
 
 	//Initialize the GPIO Pins to act as SPI2 pins
@@ -136,10 +138,15 @@ int main(void)
 	* Set the Slave Select Output Enable to 1 (Master Mode MCU)
 	* SSOE EN = NSS Output Enable
 	* NSS pin is automatically managed by the hardware: (SS Active High, MOSI Active High)
-	*	eg SPE = 1, NSS = LOW
-	*	   SPE = 0, NSS = HIGH
+	*	eg SPE = 1, NSS = LOW (Slave Enabled)
+	*	   SPE = 0, NSS = HIGH (Slave Disabled)
 	***/
 	SPI_SSOEConfig(SPI2, ENABLE);
+
+
+
+
+	SPI_PeripheralControl(SPI2, DISABLE);
 
 	while(1)
 	{
@@ -167,12 +174,6 @@ int main(void)
 
 		//Disable the peripheral - return to Idle state
 		SPI_PeripheralControl(SPI2, DISABLE);
-
-		//Hardware Slave Select
-		//The slave will not respond unless SS on the slave is pulled to low.
-		//SSM = 0 (disabled), SPE = 1, NSS (Slave select) will be low automatically
-		//SSM = 1, SPE = 0, NSS will be high automatically
-		//In order to ENABLE the NSS we need the SSOE control bit to be enabled.
 
 	}
 
