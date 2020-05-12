@@ -31,6 +31,10 @@
 #include "stm32f407xx.h"
 #include "string.h"
 
+//Include capability for semihosting - debugging print statements
+//See notes to setup Linker and Debug Configurations in conjunction with this.
+extern void initialize_monitor_handles();
+
 #define BTN_PRESSED			HIGH		//HIGH defined in stm32f407xx.h as ENABLE or 1
 
 #define LED_ON				1
@@ -217,6 +221,7 @@ uint8_t SPI_VerifyResponse(uint8_t ackbyte)
 
 int main(void)
 {
+
 	uint8_t dummy_write = 0xAA;
 	uint8_t dummy_read;
 	uint8_t ackbyte;
@@ -225,6 +230,10 @@ int main(void)
 
 	uint32_t debounceInterval = 500000/2;
 	uint32_t SPI_Interval = 50;
+
+	//Initialize semihosting print statements in the IDE Console
+	initialise_monitor_handles();
+	printf("PrintF Statements Initialized\n");
 
 	//Init Push Button
 	GPIO_ButtonInit();

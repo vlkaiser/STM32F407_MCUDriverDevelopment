@@ -2,4 +2,3 @@
 "Drivers/src/stm32f407xx_spi_driver.o"
 "src/008_SPI_TX_RX_Data.o"
 "startup/startup_stm32.o"
-"startup/sysmem.o"
