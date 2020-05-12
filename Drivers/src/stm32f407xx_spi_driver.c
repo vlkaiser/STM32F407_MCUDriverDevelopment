@@ -242,7 +242,7 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len)
 		//Wait until TX Buffer Empty:
 		while( SPI_GetFlagStatus(pSPIx, SPI_TXE_FLAG) == FLAG_RESET );
 
-			//if DFF = 1 (16 bit)
+		//if DFF = 1 (16 bit)
 		if( pSPIx->SPI_CR1 & (1 << SPI_CR1_DFF) )
 		{
 			//put 2 bytes into DR:
@@ -284,6 +284,35 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len)
  **********************************************************************/
 void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t len)
 {
+	while( len > 0)
+	{
+		//Wait until RX Buffer Full:
+		while( SPI_GetFlagStatus(pSPIx, SPI_RXNE_FLAG) == FLAG_RESET );
+
+		//if DFF = 1 (16 bit)
+		if( pSPIx->SPI_CR1 & (1 << SPI_CR1_DFF) )
+		{
+			//READ 2 bytes FROM DR:
+				//Typecast (uint8 pointer-to-buffer [1 byte]) to (uint16 pointer-to-buffer [2 bytes]), then Dereference that pointer
+
+			*((uint16_t*)pRxBuffer) = pSPIx->SPI_DR;
+
+			len -= 2; 					//decrement length remaining by 2 bytes
+
+			(uint16_t*)pRxBuffer++;		//Increment TxBuffer by 2 bytes (cast to 2 bytes)
+
+		}else
+		{
+			//Read 1 byte from DR:
+				//Dereferenced pointer-to-buffer
+			*pRxBuffer = pSPIx->SPI_DR;
+
+			len--;				//decrement length remaining by 1 byte
+
+			pRxBuffer++;		//Increment TxBuffer by 1 byte
+		}
+
+	}
 
 }//SPI_ReceiveData
 

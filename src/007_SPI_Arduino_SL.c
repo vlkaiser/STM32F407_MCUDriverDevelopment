@@ -143,11 +143,6 @@ int main(void)
 	***/
 	SPI_SSOEConfig(SPI2, ENABLE);
 
-
-
-
-	SPI_PeripheralControl(SPI2, DISABLE);
-
 	while(1)
 	{
 		//Wait for Button Press:

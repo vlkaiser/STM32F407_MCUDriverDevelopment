@@ -15,11 +15,26 @@ RM := rm -rf
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(strip $(CC_DEPS)),)
+-include $(CC_DEPS)
+endif
+ifneq ($(strip $(C++_DEPS)),)
+-include $(C++_DEPS)
+endif
+ifneq ($(strip $(C_UPPER_DEPS)),)
+-include $(C_UPPER_DEPS)
+endif
+ifneq ($(strip $(CXX_DEPS)),)
+-include $(CXX_DEPS)
+endif
 ifneq ($(strip $(S_UPPER_DEPS)),)
 -include $(S_UPPER_DEPS)
 endif
 ifneq ($(strip $(C_DEPS)),)
 -include $(C_DEPS)
+endif
+ifneq ($(strip $(CPP_DEPS)),)
+-include $(CPP_DEPS)
 endif
 endif
 
@@ -31,10 +46,10 @@ endif
 all: STM32F407_Drivers.elf
 
 # Tool invocations
-STM32F407_Drivers.elf: $(OBJS) $(USER_OBJS) C:\Users\vkaiser\Documents\_STM32LocalRepository\STM32F407_Drivers/LinkerScript.ld
+STM32F407_Drivers.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"C:/Users/vkaiser/Documents/_STM32LocalRepository/STM32F407_Drivers/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "STM32F407_Drivers.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
+	@echo 'Invoking: MCU G++ Linker'
+	arm-none-eabi-g++ -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"C:/Users/vkaiser/Documents/_STM32LocalRepository/STM32F407_Drivers/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -fno-exceptions -fno-rtti -o "STM32F407_Drivers.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build

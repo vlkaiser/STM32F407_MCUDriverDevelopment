@@ -12,7 +12,7 @@
 #include <SPI.h>
 #include<stdint.h>
 #define SPI_SCK 13
-#define SPI_MISO 12
+#define SPI_MISO 12 //unused
 #define SPI_MOSI 11
 #define SPI_SS 10
 
