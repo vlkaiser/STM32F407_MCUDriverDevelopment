@@ -223,6 +223,9 @@ int main(void)
 	uint8_t args[2];
 	uint8_t analog_read;
 
+	uint32_t debounceInterval = 500000/2;
+	uint32_t SPI_Interval = 50;
+
 	//Init Push Button
 	GPIO_ButtonInit();
 
@@ -246,7 +249,7 @@ int main(void)
 		//Wait for Button Press:
 		while( ! GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_0) );
 
-		delay(500000/2);		//debounce delay
+		delay(debounceInterval);		//debounce delay
 
 		//Enable SPI2 Peripheral
 		SPI_PeripheralControl(SPI2, ENABLE);
@@ -282,7 +285,7 @@ int main(void)
 		//Wait for Button Press
 		while( ! GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_0) );
 
-		delay(500000/2);		//debounce delay
+		delay(debounceInterval);		//debounce delay
 
 		//CMD_Sensor_Read
 		commandcode = COMMAND_SENSOR_READ;
@@ -298,21 +301,14 @@ int main(void)
 			args[0] = ANALOG_PIN1;				//Arduino Pin
 			SPI_SendData(SPI2, args, 1);		//Send data
 
-			delay(50);
-
 			// Read Sensor Data
 			SPI_ReceiveData(SPI2, &dummy_read, 1);		//Received Data on the MISO line
 
 			//Delay for slave to ready with the data
-			delay(50);
+			delay(SPI_Interval);
 
 			SPI_SendData (SPI2, &dummy_write, 1);
-
-			delay(50);
-
 			SPI_ReceiveData(SPI2, &analog_read, 1);
-
-			delay(50);
 
 		}
 
