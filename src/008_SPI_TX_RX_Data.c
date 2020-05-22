@@ -277,7 +277,7 @@ int main(void)
 	uint8_t id[10];
 
 	uint32_t debounceInterval = 500000/2;
-	uint32_t SPI_Interval = 500;
+	uint32_t SPI_Interval = 300;		//Seems to be min delay
 
 	//Initialize semihosting print statements in the IDE Console
 	initialise_monitor_handles();
@@ -323,8 +323,6 @@ int main(void)
 			SPI_SendData(SPI2, args, 2);	//Send data
 			printf("LED: %d\n", setLED_State);
 		}
-		// TESTED: WORKING //
-
 
 		//Wait for Button Press
 		printf("Waiting...\n");
@@ -342,19 +340,19 @@ int main(void)
 			args[0] = ANALOG_PIN1;				//Arduino Pin
 			SPI_SendData(SPI2, args, 1);		//SPI_Send (Arduino Pin to read data from)
 
-			delay(SPI_Interval);
+			delay(SPI_Interval);	//Wait
 
 			// Read Sensor Data
 			SPI_ReceiveData(SPI2, &dummy_read, 1);		//SPI_Receive
 
 			//Delay for slave to ready with the data
-			delay(SPI_Interval);
+			delay(SPI_Interval);	//Wait
 
 			SPI_SendData(SPI2, &dummy_write, 1);		//Dummy write to initiate slave transfer
 
-			delay(SPI_Interval);
-
 			SPI_ReceiveData(SPI2, &analog_read, 1);		//Read sensor data
+
+			delay(SPI_Interval);	//Wait
 
 			printf("Sensor Data %d \n", analog_read);
 
