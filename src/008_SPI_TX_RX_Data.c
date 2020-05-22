@@ -30,10 +30,11 @@
 
 #include "stm32f407xx.h"
 #include "string.h"
+#include <stdio.h>
 
 //Include capability for semihosting - debugging print statements
 //See notes to setup Linker and Debug Configurations in conjunction with this.
-extern void initialize_monitor_handles();
+extern void initialise_monitor_handles();
 
 #define BTN_PRESSED			HIGH		//HIGH defined in stm32f407xx.h as ENABLE or 1
 
@@ -64,6 +65,7 @@ void SPI2_GPIOInits(void);
 void SPI2_Inits(void);
 void GPIO_ButtonInit(void);
 uint8_t SPI_VerifyResponse(uint8_t ackbyte);
+uint8_t sendSPI(uint8_t commandcode);
 
 /***************************************************************************************************************/
 
@@ -219,17 +221,63 @@ uint8_t SPI_VerifyResponse(uint8_t ackbyte)
 	}
 }
 
+/*******************************************************************************
+ * @fn					- sendSPI
+ *
+ * @brief				- Sends command code over SPI with dummy read, write and receives ACK.
+ *
+ * @param[in]			- uint8_t commandcode
+ *
+ * @return				- SPI_VerifyResponse (ACK: 1 or NACK: 0)
+ *
+ * @note				-
+ ******************************************************************************/
+uint8_t sendSPI(uint8_t commandcode)
+{
+	uint8_t dummy_write = 0xAA;
+	uint8_t dummy_read;
+	uint8_t ackbyte;
+
+	//Enable SPI2 Peripheral
+	SPI_PeripheralControl(SPI2, ENABLE);
+
+	// Send the Command Codes over SPI to the Slave.
+	// If the Slave recognizes the command code, it will send ACK
+	// Every time MS/SL sends 1 byte, it receives 1 byte in return
+
+	// 1. Send Command: CMD_LED_CRL <pin no(1)>	<value(1)>
+	SPI_SendData (SPI2, &commandcode, 1 );			//Send the command code:  SPI_SendData: SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len)
+
+	// 2. Read return (garbage) byte from Slave and clear the RXNE flag
+	SPI_ReceiveData(SPI2, &dummy_read, 1);
+
+	// 3. Receive ACK if Valid, NACK if invalid
+	// Ask for Data from Slave (8 bit communication, use 1 byte.  16 bit communication, send 2 bytes).
+	SPI_SendData (SPI2, &dummy_write, 1);
+
+	// 4. Receive ACK/NACK from Slave
+	SPI_ReceiveData(SPI2, &ackbyte, 1);
+
+	// 5. Verify if ACK or NACK
+	return (SPI_VerifyResponse(ackbyte));
+
+}
+
+/*******************************************************************************
+ * 									 MAIN
+ ******************************************************************************/
 int main(void)
 {
 
 	uint8_t dummy_write = 0xAA;
 	uint8_t dummy_read;
-	uint8_t ackbyte;
 	uint8_t args[2];
 	uint8_t analog_read;
+	uint8_t setLED_State = 1;
+	uint8_t id[10];
 
 	uint32_t debounceInterval = 500000/2;
-	uint32_t SPI_Interval = 50;
+	uint32_t SPI_Interval = 500;
 
 	//Initialize semihosting print statements in the IDE Console
 	initialise_monitor_handles();
@@ -237,12 +285,14 @@ int main(void)
 
 	//Init Push Button
 	GPIO_ButtonInit();
+	printf("GPIO Initialized\n");
 
 	//Initialize the GPIO Pins to act as SPI2 pins
 	SPI2_GPIOInits();
 
 	//Initialize the SPI peripheral
 	SPI2_Inits();
+	printf("SPI Initialized\n");
 
 	/***
 	* Set the Slave Select Output Enable to 1 (Master Mode MCU)
@@ -256,71 +306,136 @@ int main(void)
 	while(1)
 	{
 		//Wait for Button Press:
+		printf("Waiting...\n");
 		while( ! GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_0) );
-
 		delay(debounceInterval);		//debounce delay
 
-		//Enable SPI2 Peripheral
-		SPI_PeripheralControl(SPI2, ENABLE);
-
-		// Send the Command Codes over SPI to the Slave.
-		// If the Slave recognizes the command code, it will send ACK
-		//Every time MS/SL sends 1 byte, it receives 1 byte in return
-
-		// 1. Send Command: CMD_LED_CRL <pin no(1)>	<value(1)>
+		// COMMAND_LED_CTRL
+		printf("COMMAND_LED_CTRL:\n");
 		uint8_t commandcode = COMMAND_LED_CTRL;			//create a variable for the command codes
-		SPI_SendData (SPI2, &commandcode, 1 );			//Send the command code:  SPI_SendData: SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len)
-
-		// 2. Read return (garbage) byte from Slave and clear the RXNE flag
-		SPI_ReceiveData(SPI2, &dummy_read, 1);
-
-		// 2. Receive ACK if Valid, NACK if invalid
-		// Ask for Data from Slave (8 bit communication, use 1 byte.  16 bit communication, send 2 bytes).
-		SPI_SendData (SPI2, &dummy_write, 1);
-
-		// Receive ACK/NACK from Slave
-		SPI_ReceiveData(SPI2, &ackbyte, 1);
-
-		// 3. Verify if ACK or NACK
-		if ( SPI_VerifyResponse(ackbyte) )
+		if (sendSPI(commandcode))
 		{
+			printf("ACK: Send LED CMD.\n");
 			//Send Arguments
 			args[0] = LED_PIN;				//Arduino Pin
-			args[1] = LED_ON;				//State of pin
+			//args[1] = LED_ON;				//State of pin
+			args[1] = setLED_State;				//State of pin
 			SPI_SendData(SPI2, args, 2);	//Send data
+			printf("LED: %d\n", setLED_State);
 		}
+		// TESTED: WORKING //
 
 
 		//Wait for Button Press
+		printf("Waiting...\n");
 		while( ! GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_0) );
-
 		delay(debounceInterval);		//debounce delay
 
-		//CMD_Sensor_Read
+		// COMMAND_SENSOR_READ
+		printf("COMMAND_SENSOR_READ:\n");
 		commandcode = COMMAND_SENSOR_READ;
-		SPI_SendData (SPI2, &commandcode, 1 );			//Send the command code 0x51
-		SPI_ReceiveData(SPI2, &dummy_read, 1);
 
-		SPI_SendData (SPI2, &dummy_write, 1);			//0xAA
-		SPI_ReceiveData(SPI2, &ackbyte, 1);
-
-		if ( SPI_VerifyResponse(ackbyte) )
+		if ( sendSPI(commandcode) )					//SPI_Send/Read, Send/Read
 		{
+			printf("ACK: Send SENSOR READ.\n");
 			//Send Arguments
 			args[0] = ANALOG_PIN1;				//Arduino Pin
-			SPI_SendData(SPI2, args, 1);		//Send data
+			SPI_SendData(SPI2, args, 1);		//SPI_Send (Arduino Pin to read data from)
+
+			delay(SPI_Interval);
 
 			// Read Sensor Data
-			SPI_ReceiveData(SPI2, &dummy_read, 1);		//Received Data on the MISO line
+			SPI_ReceiveData(SPI2, &dummy_read, 1);		//SPI_Receive
 
 			//Delay for slave to ready with the data
 			delay(SPI_Interval);
 
-			SPI_SendData (SPI2, &dummy_write, 1);
-			SPI_ReceiveData(SPI2, &analog_read, 1);
+			SPI_SendData(SPI2, &dummy_write, 1);		//Dummy write to initiate slave transfer
+
+			delay(SPI_Interval);
+
+			SPI_ReceiveData(SPI2, &analog_read, 1);		//Read sensor data
+
+			printf("Sensor Data %d \n", analog_read);
 
 		}
 
+		//Wait for Button Press
+		printf("Waiting...\n");
+		while( ! GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_0) );
+		delay(debounceInterval);		//debounce delay
+
+		// COMMAND_LED_READ
+		printf("COMMAND_LED_READ:\n");
+		commandcode = COMMAND_LED_READ;			//create a variable for the command codes
+		if (sendSPI(commandcode))
+		{
+			printf("ACK: Read LED\n");
+			//Send Arguments
+			args[0] = LED_PIN;				//Arduino Pin
+			SPI_SendData(SPI2, args, 1);	//Send Pin to read
+
+			// Read Data
+			SPI_ReceiveData(SPI2, &dummy_read, 1);		//"ACK" for send - Received Data on the MISO line
+
+			//Delay for slave to ready with the data
+			delay(SPI_Interval);
+
+			SPI_SendData (SPI2, &dummy_write, 1);		//Dummy write to initiate slave transfer
+			SPI_ReceiveData(SPI2, &analog_read, 1);		//Read led state
+
+			//update next LED_State
+			if(analog_read == 1){setLED_State = 0;}
+			if(analog_read == 0){setLED_State = 1;}
+
+			//printf("LED State: \n");
+			printf("LED State: %d\n", analog_read);
+		}
+
+		//Wait for Button Press
+		printf("Waiting...\n");
+		while( ! GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_0) );
+		delay(debounceInterval);		//debounce delay
+
+		// COMMAND_PRINT
+		printf("COMMAND_PRINT:\n");
+		commandcode = COMMAND_PRINT;			//create a variable for the command codes
+		if (sendSPI(commandcode))
+		{
+			printf("ACK: Send Print CMD.\n");
+			uint8_t msg[] = "This shit is bananas!";
+			//Send Arguments
+			args[0] = strlen((char*)msg);				//data length is first slave receive, and is used to setup iterating thru msg
+			SPI_SendData(SPI2, args, 1);				//Send args
+
+			SPI_SendData(SPI2, msg, args[0]);			//Second slave receive iterates thru 'msg' i times, and you have to pass in data (msg) and datalength (strlen -> args[0])
+
+			printf("Printed\n");
+		}
+
+
+		//Wait for Button Press
+		printf("Waiting...\n");
+		while( ! GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_0) );
+		delay(debounceInterval);		//debounce delay
+
+		// COMMAND_ID_READ
+		printf("COMMAND_ID_READ:\n");
+		commandcode = COMMAND_ID_READ;			//create a variable for the command codes
+		if (sendSPI(commandcode))
+		{
+			printf("ACK: Read CMD ID.\n");
+
+			for( int i = 0; i< 10; i++ )
+			{
+				SPI_SendData (SPI2, &dummy_write, 1);		//Dummy write to initiate slave transfer
+				SPI_ReceiveData(SPI2, &id[i], 1);		//Read led state
+			}
+			id[11] = '\0';		//Terminal character
+
+			//printf("CMD ID\n");
+			printf("CMD ID: %s\n", id);
+		}
 
 		/* Before we Close SPI we must make sure SPI is not BUSY [BSY = 0] by checking the SPI Status BSY flag */
 		// Wait for busy flag != 1
@@ -329,7 +444,7 @@ int main(void)
 		//Disable the peripheral - return to Idle state
 		SPI_PeripheralControl(SPI2, DISABLE);
 
-	}
+	}// While()
 
 	return 0;
 }
