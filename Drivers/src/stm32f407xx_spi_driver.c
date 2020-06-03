@@ -331,7 +331,45 @@ void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t len)
  **********************************************************************/
 void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 {
+	if(EnorDi == ENABLE)
+	{
+		//If Enable
+		if(IRQNumber <= 31)
+		{
+			//program ISER0 registers
+			*NVIC_ISER0 |= ( 1 << IRQNumber);
+		}
+		else if(IRQNumber > 31 && IRQNumber < 64)
+		{
+			//program ISER1 registers
+			*NVIC_ISER1 |= ( 1 << (IRQNumber % 32) );
+		}
+		else if(IRQNumber >= 64 && IRQNumber < 96)
+		{
+			//program ISER2 registers - IRQ only goes up to 80
+			*NVIC_ISER2 |= ( 1 << (IRQNumber % 64) );
+		}
 
+	}
+	else
+	{
+		if(IRQNumber <= 31)
+		{
+			//Program ICER0 register
+			*NVIC_ICER0 |= ( 1 << IRQNumber);
+		}
+		else if(IRQNumber > 31 && IRQNumber < 64)
+		{
+			//program ICER1 registers
+			*NVIC_ICER1 |= ( 1 << (IRQNumber % 32) );
+		}
+		else if(IRQNumber >= 64 && IRQNumber < 96)
+		{
+			//program ICER2 registers - IRQ only goes up to 80
+			*NVIC_ICER2 |= ( 1 << (IRQNumber % 64) );
+		}
+
+	}
 
 }//SPI_IRQConfig
 
@@ -370,6 +408,79 @@ void SPI_IRQHandling(SPI_Handle_t *pSPIHandle)
 {
 
 }//SPI_IRQHandling
+
+/**********************************************************************
+ * @fn					- SPI_SendDataIT
+ *
+ * @brief				- Transmit data on interrupt - when data is available to send, trigger an interrupt to send it
+ *
+ * @param[in]			- struct of parameters *pSPIHandle
+ * @param[in]			- data to transmit *pTxBuffer
+ * @param[in]			- length of data
+ *
+ * @return				- State (of SPI register TX_BUSY)
+ *
+ * @note				- API to send data with interrupt mode.
+ *	 					  Use the Handler to actually write data to the data register
+ **********************************************************************/
+uint8_t SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t len)
+{
+	uint8_t state = pSPIHandle->TxState;
+
+	if( state != SPI_BUSY_IN_TX)
+	{
+		//1. Save the TX buffer address and LEN information in global variables (Handle Structure)
+		pSPIHandle->pTxBuffer = pTxBuffer;
+		pSPIHandle->TxLen = len;
+
+		//2. Mark the SPI state as busy in TX so no other code can take over the same SPI peripheral until TX is over
+		pSPIHandle->TxState = SPI_BUSY_IN_TX;
+
+		//3. Enable the TXIE control bit to get interrupt whenever TXE flag is set in SR
+		pSPIHandle->pSPIx->SPI_CR2 |= ( 1 << SPI_CR2_TXEIE);
+
+	}
+
+	return state;
+
+}//SPI_SendDataIT
+
+/**********************************************************************
+ * @fn					- SPI_ReceiveDataIT
+ *
+ * @brief				- Receive data on interrupt - when data is available to read, trigger an interrupt to read it
+ *
+ * @param[in]			- struct of parameters *pSPIHandle
+ * @param[in]			- data to Read *pRxBuffer
+ * @param[in]			- length of data
+ *
+ * @return				- State (of SPI register RX_BUSY)
+ *
+ * @note				- API to send data with interrupt mode.
+ *	 					  Use the Handler to actually write data to the data register
+ **********************************************************************/
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t len)
+{
+	uint8_t state = pSPIHandle->RxState;
+
+		if( state != SPI_BUSY_IN_RX)
+		{
+			//1. Save the TX buffer address and LEN information in global variables (Handle Structure)
+			pSPIHandle->pRxBuffer = pRxBuffer;
+			pSPIHandle->RxLen = len;
+
+			//2. Mark the SPI state as busy in TX so no other code can take over the same SPI peripheral until TX is over
+			pSPIHandle->RxState = SPI_BUSY_IN_RX;
+
+			//3. Enable the TXIE control bit to get interrupt whenever TXE flag is set in SR
+			pSPIHandle->pSPIx->SPI_CR2 |= ( 1 << SPI_CR2_RXNIE);
+
+		}
+
+		return state;
+
+
+}//SPI_ReceiveDataIT
 
 /**********************************************************************
  * @fn					- SPI_GetStatusFlag

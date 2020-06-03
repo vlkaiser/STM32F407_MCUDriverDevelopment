@@ -30,8 +30,15 @@ typedef struct
  */
 typedef struct
 {
-	SPI_RegDef_t 	*pSPIx;					/*!< @SPI_RegDef_t	- Holds the base address of SPIx(x:0, 1, 2) peripheral					>*/
-	SPI_Config_t	SPIConfig;				/*!< @SPI_Config_t 	- SPI Mode Config struct												>*/
+	SPI_RegDef_t 	*pSPIx;			/*!< @SPI_RegDef_t	- Holds the base address of SPIx(x:0, 1, 2) peripheral	>*/
+	SPI_Config_t	SPIConfig;		/*!< @SPI_Config_t 	- SPI Mode Config struct >*/
+	//Add for interrupts
+	uint8_t			*pTxBuffer;		/*!< To store the application Tx Buffer address >*/
+	uint8_t			*pRxBuffer;		/*!< To store the application Rx Buffer address >*/
+	uint32_t		TxLen;			/*!< To store Tx Length >*/
+	uint32_t		RxLen;			/*!< To store Rx Length >*/
+	uint8_t			TxState;		/*!< To store Tx state >*/
+	uint8_t			RxState;		/*!< To store Rx state >*/
 
 }SPI_Handle_t;
 
@@ -53,50 +60,57 @@ typedef struct
  * @SPI_SclkSpeed	//SPI_CR1 BaudRate [BR]
  * HSI Clock (System Clock) = 16MHz
  */
-#define SPI_SCLK_SPEED_DIV2						0		/* fpclk/2		*/
-#define SPI_SCLK_SPEED_DIV4						1		/* fpclk/4		*/
-#define SPI_SCLK_SPEED_DIV8						2		/* fpclk/8		*/
-#define SPI_SCLK_SPEED_DIV16					3		/* fpclk/16		*/
-#define SPI_SCLK_SPEED_DIV32					4		/* fpclk/32		*/
-#define SPI_SCLK_SPEED_DIV64					5		/* fpclk/64		*/
-#define SPI_SCLK_SPEED_DIV128					6		/* fpclk/128	*/
-#define SPI_SCLK_SPEED_DIV256					7		/* fpclk/256	*/
+#define SPI_SCLK_SPEED_DIV2			0		/* fpclk/2		*/
+#define SPI_SCLK_SPEED_DIV4			1		/* fpclk/4		*/
+#define SPI_SCLK_SPEED_DIV8			2		/* fpclk/8		*/
+#define SPI_SCLK_SPEED_DIV16		3		/* fpclk/16		*/
+#define SPI_SCLK_SPEED_DIV32		4		/* fpclk/32		*/
+#define SPI_SCLK_SPEED_DIV64		5		/* fpclk/64		*/
+#define SPI_SCLK_SPEED_DIV128		6		/* fpclk/128	*/
+#define SPI_SCLK_SPEED_DIV256		7		/* fpclk/256	*/
 
 /*
  * @SPI_DFF	//SPI_CR1 Data Frame Format
  */
-#define SPI_DFF_8BITS							0		/* DEFAULT: 8-bit data frame format for TX/RX 	*/
-#define SPI_DFF_16BITS							1		/* 16-bit data frame format for TX/RX 			*/
+#define SPI_DFF_8BITS		0		/* DEFAULT: 8-bit data frame format for TX/RX 	*/
+#define SPI_DFF_16BITS		1		/* 16-bit data frame format for TX/RX 			*/
 
 /*
  * @SPI_CPOL	//SPI_CR1 CLOCK POLARITY
  */
-#define	SPI_CPOL_HIGH							1		/* Clock Polarity High when idle	*/
-#define	SPI_CPOL_LOW							0		/* Clock Polarity Low when idle	*/
+#define	SPI_CPOL_HIGH		1		/* Clock Polarity High when idle	*/
+#define	SPI_CPOL_LOW		0		/* Clock Polarity Low when idle	*/
 
 /*
  * @SPI_CPHA	//SPI_CR1 Clock Phase
  */
-#define	SPI_CPHA_HIGH							1		/* The second clock transition is the first data capture edge	*/
-#define	SPI_CPHA_LOW							0		/* The first clock transition is the first data capture edge	*/
+#define	SPI_CPHA_HIGH		1		/* The second clock transition is the first data capture edge	*/
+#define	SPI_CPHA_LOW		0		/* The first clock transition is the first data capture edge	*/
 
 /*
  * @SPI_SSM		//SPI_CR1 SLAVE MANAGEMENT (SSM/SSI)
  */
-#define SPI_SSM_DI								0		/* Software Slave Management Disabled (HW slave management)	*/
-#define SPI_SSM_EN								1		/* Software Slave Management Enabled	*/
+#define SPI_SSM_DI		0		/* Software Slave Management Disabled (HW slave management)	*/
+#define SPI_SSM_EN		1		/* Software Slave Management Enabled	*/
 
 /*
  *SPI Related Status Flag Definitions
  */
-#define SPI_BSY_FLAG							(1 << SPI_SR_BSY)		/* Masking info of SPI Busy Flag in SPI SR register 				*/
-#define SPI_OVR_FLAG							(1 << SPI_SR_OVR)		/* Masking info of SPI Overrun Flag in SPI SR register 				*/
-#define SPI_MODF_FLAG							(1 << SPI_SR_MODF)		/* Masking info of SPI Mode Fault Flag in SPI SR register 			*/
-#define SPI_CRCERR_FLAG							(1 << SPI_SR_CRCERR)	/* Masking info of SPI CRC Error Flag in SPI SR register 			*/
-#define SPI_UDR_FLAG							(1 << SPI_SR_UDR)		/* Masking info of SPI Underrun Flag in SPI SR register 			*/
-#define SPI_CHSIDE_FLAG							(1 << SPI_SR_CHSIDE)	/* Masking info of SPI Channel Side Flag in SPI SR register 		*/
-#define SPI_TXE_FLAG							(1 << SPI_SR_TXE)		/* Masking info of Transmit buffer empty Flag in SPI SR register 	*/
-#define SPI_RXNE_FLAG							(1 << SPI_SR_RXNE)		/* Masking info of RX Buffer Not empty Flag in SPI SR register 		*/
+#define SPI_BSY_FLAG			(1 << SPI_SR_BSY)		/* Masking info of SPI Busy Flag in SPI SR register 				*/
+#define SPI_OVR_FLAG			(1 << SPI_SR_OVR)		/* Masking info of SPI Overrun Flag in SPI SR register 				*/
+#define SPI_MODF_FLAG			(1 << SPI_SR_MODF)		/* Masking info of SPI Mode Fault Flag in SPI SR register 			*/
+#define SPI_CRCERR_FLAG			(1 << SPI_SR_CRCERR)	/* Masking info of SPI CRC Error Flag in SPI SR register 			*/
+#define SPI_UDR_FLAG			(1 << SPI_SR_UDR)		/* Masking info of SPI Underrun Flag in SPI SR register 			*/
+#define SPI_CHSIDE_FLAG			(1 << SPI_SR_CHSIDE)	/* Masking info of SPI Channel Side Flag in SPI SR register 		*/
+#define SPI_TXE_FLAG			(1 << SPI_SR_TXE)		/* Masking info of Transmit buffer empty Flag in SPI SR register 	*/
+#define SPI_RXNE_FLAG			(1 << SPI_SR_RXNE)		/* Masking info of RX Buffer Not empty Flag in SPI SR register 		*/
+
+/*
+ *Possible SPI Application States
+ */
+#define SPI_READY			0	/* SPI Ready to TX/RX 		*/
+#define SPI_BUSY_IN_RX		1	/* SPI in-process of RX 	*/
+#define SPI_BUSY_IN_TX		2	/* SPI in-process of TX 	*/
 
 /**********************************************************************************************************************
  *										APIs supported by this driver
@@ -118,6 +132,12 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx);							/*!< De-Initialize the registers of 
  */
 void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len);			/*!< Base Address, Pointer to Data, size of data (std uint32_t) >*/
 void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t len);		/*!< Base Address, Pointer to Data storage, size of data >*/
+
+/*
+ * Peripheral Data Interrupt - Send and Receive
+ */
+uint8_t SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t len);			/*!< SPI Handle, Pointer to Data, size of data (std uint32_t) >*/
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t len);			/*!< SPI Handle, Pointer to Data storage, size of data >*/
 
 /*
  * Peripheral IRQ Configuration and ISR Handling

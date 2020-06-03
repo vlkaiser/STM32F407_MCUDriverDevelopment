@@ -80,10 +80,11 @@
 
 
 /************************ TODO: PERIPHERAL INTERRUPTS **********************************/
-//ToDo: Configure SPI Interrupts
+
 /*
  * IRQ (Interrupt Request) Numbers for STM32F407x MCU
  */
+//GPIO
 #define IRQ_EXTI0		6
 #define IRQ_EXTI1		7
 #define IRQ_EXTI2		8
@@ -91,6 +92,11 @@
 #define IRQ_EXTI4		10
 #define IRQ_EXTI9_5		23
 #define IRQ_EXTI5_10	40
+//SPI
+#define IRQ_SPI1		35
+#define IRQ_SPI2		36
+#define IRQ_SPI3		51
+
 
 /************************ END: Processor Specific Details **********************************/
 
