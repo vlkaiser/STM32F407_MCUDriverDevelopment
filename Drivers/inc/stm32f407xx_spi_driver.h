@@ -112,6 +112,15 @@ typedef struct
 #define SPI_BUSY_IN_RX		1	/* SPI in-process of RX 	*/
 #define SPI_BUSY_IN_TX		2	/* SPI in-process of TX 	*/
 
+/*
+ * Possible SPI Application Events
+ */
+#define SPI_EVENT_TX_COMPLETE	1		/* SPI TX Completed 			*/
+#define SPI_EVENT_RX_COMPLETE	2		/* SPI RX Completed 			*/
+#define SPI_EVENT_OVR_ERR		3		/* SPI Overrun Error Detected 	*/
+#define SPI_EVENT_CRC_ERR		4		/* SPI CRC Error Detected 		*/
+
+
 /**********************************************************************************************************************
  *										APIs supported by this driver
  *						For more information about the APIs - see function definitions
@@ -146,6 +155,7 @@ void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi);						/*!< Config
 void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority);				/*!< Configure Interrupt Priority >*/
 void SPI_IRQHandling(SPI_Handle_t *pSPIHandle);										/*!< Configure Interrupt Handling for a pin number >*/
 
+
 /*
  * Other Peripheral Control APIs
  */
@@ -153,4 +163,17 @@ uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t flagName );					/*!< Get
 void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi);					/*!< Enable or Disable SPI Peripheral >*/
 void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi);							/*!< Enable or Disable SPI Internal Slave Select  >*/
 void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi);							/*!< Enable or Disable SSOE Control bit for NSS (Slave Select Output Enable)  >*/
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName);					/*!< Get SPI flag status  >*/
+void SPI_ClearOVRFlag(SPI_RegDef_t *pSPIx);											/*!< The application may call this function to clear the overrun flag	>*/
+void SPI_CloseTransmission(SPI_Handle_t *pSPIHandle);								/*!< The application may call this function to close TX	>*/
+void SPI_CloseReception(SPI_Handle_t *pSPIHandle);									/*!< The application may call this function to close RX	>*/
+
+/*
+ * Application Callbacks
+ * These must be implemented by the application
+ * They have weak definitions in the SPI_Driver.c in the event the application does not implement them.
+ */
+void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle, uint8_t AppEvent);			/*!< The application may implement this function to receive SPI Events	>*/
+
+
 #endif /* SRC_STM32F407XX_SPI_DRIVER_H_ */

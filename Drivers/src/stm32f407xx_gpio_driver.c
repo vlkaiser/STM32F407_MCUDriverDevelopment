@@ -127,7 +127,7 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
 	}
 	else
 	{
-		//ToDo: Configure the interrupt mode of the GPIO Pin
+		//Configure the interrupt mode of the GPIO Pin
 		if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_IT_FT)
 		{
 			//Rising Edge Interrupt: Configure the FTSR
